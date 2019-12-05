@@ -1,7 +1,12 @@
 #include <iostream>
+#include <GL/glew.h>
+#include <GLFW\glfw3.h>
+
 
 #define WIDTH 1280
 #define HEIGHT 960
+
+//render to global variable
 
 static void char_callback(GLFWwindow* window, unsigned int key)
 {
@@ -42,8 +47,8 @@ GLFWwindow* init_GLFW() {
 		exit(EXIT_FAILURE);
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_MAJOR);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_MINOR);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, (GLint)GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
@@ -86,6 +91,9 @@ GLFWwindow* init_GLFW() {
 int main(int argc, char* argv[]) {
 
 	GLFWwindow* window = init_GLFW();
+	
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
 
 	while (!glfwWindowShouldClose(window)) {
 

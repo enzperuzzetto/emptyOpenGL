@@ -52,5 +52,5 @@ target_link_libraries(
 				glfw
 				${GLFW_LIBRARIES})
 
-file(GLOB SHADERS "data/shaders/*.vert" "data/shaders/*.frag")
-IndicateExternalFile("emptyOpengGL" ${SHADERS})
+#file(GLOB SHADERS "data/shaders/*.vert" "data/shaders/*.frag")
+#IndicateExternalFile("native-ogl" ${SHADERS})
