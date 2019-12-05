@@ -1,0 +1,66 @@
+#include <string>
+
+#include "opengl.h"
+
+class Shader
+{
+public:
+	Shader() :
+		mIsValid(false),
+		mProgramID(-1)
+	{}
+
+	/** Compiles and links the shader from 2 source files
+		\param fileV vertex shader ("" if no vertex shader)
+		\param fileF fragment shader ("" if no fragment shader)
+		\return true if no error occurs
+	*/
+	bool loadFromFiles(const std::string& fileV, const std::string& fileF);
+
+	bool loadSources(const std::string& vsrc, const std::string& fsrc);
+
+	/** Enable / Disable the shader
+	*/
+	void activate() const;
+	void deactivate() const;
+
+	/** \return the index of the uniform variable \a name
+	*/
+	int getUniformLocation(const char* name) const;
+
+	/** Forces a sampler to a given unit
+		Example:
+		\code
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE2D, myTextureID);
+	myShader->setSamplerUnit("mySampler", 2);
+		\endcode
+	*/
+	void setSamplerUnit(const char* samplerName, int textureUnit) const;
+
+	/** \returns the index of the generic attribute \a name
+		To be used with glVertexAttribPointer(...)
+		Example:
+		\code
+	int tangentAttribID = myShader->getAttribLocation("tangent");
+	Vector3f* tangents = new Vector3f[...];
+	glVertexAttribPointer(tangentAttribID, 3, GL_FLOAT, GL_FALSE, 0, tangents);
+	glEnableVertexAttribArray(tangentAttribID);
+		\endcode
+	*/
+	int getAttribLocation(const char* name) const;
+
+	/** \returns the OpenGL object id of the GLSL program */
+	int id() const { return mProgramID; }
+
+	bool valid() const { return mIsValid; }
+
+	void dumpInfos() const;
+
+protected:
+
+	bool mIsValid;
+	static void printProgramInfoLog(GLuint objectID);
+	static void printShaderInfoLog(GLuint objectID);
+	GLuint mProgramID;
+};

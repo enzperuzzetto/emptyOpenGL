@@ -1,19 +1,22 @@
 #include <iostream>
-#include <GL/glew.h>
-#include <GLFW\glfw3.h>
+
+#include "renderer.h"
 
 
 #define WIDTH 1280
 #define HEIGHT 960
 
 //render to global variable
+std::unique_ptr<Renderer> pRender;
 
 static void char_callback(GLFWwindow* window, unsigned int key)
 {
+	pRender->charPressed(key);
 }
 
 static void scroll_callback(GLFWwindow* window, double x, double y)
 {
+	pRender->mouseScroll(x, y);
 }
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -21,18 +24,23 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if ((key == GLFW_KEY_Q || key == GLFW_KEY_ESCAPE) && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
+
+	pRender->keyPressed(key, action, mods);
 }
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
+	pRender->mousePressed(window, button, action);
 }
 
 void cursorPos_callback(GLFWwindow* window, double x, double y)
 {
+	pRender->mouseMoved(x, y);
 }
 
 void  reshape_callback(GLFWwindow* window, int width, int height)
 {
+	pRender->reshape(width, height);
 }
 
 void error_callback(int error, const char* message) {
@@ -91,13 +99,18 @@ GLFWwindow* init_GLFW() {
 int main(int argc, char* argv[]) {
 
 	GLFWwindow* window = init_GLFW();
-	
+
+	pRender = std::make_unique<Renderer>();
+
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
+
+	pRender->init(width, height);
 
 	while (!glfwWindowShouldClose(window)) {
 
 		//render here
+		pRender->drawScene();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

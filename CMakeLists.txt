@@ -34,9 +34,15 @@ endif()
 
 set(SRC_FILES 
 	#include
-
+	include/opengl.h
+	include/renderer.h
+	include/glew.c
+	include/shader.h
+		
 	#src
 	src/main.cpp
+	src/renderer.cpp
+	src/shader.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
