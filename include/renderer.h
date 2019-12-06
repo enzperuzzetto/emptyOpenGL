@@ -1,7 +1,9 @@
 #pragma once
-
-#include "opengl.h"
 #include "shader.h"
+#include "opengl.h"
+#include "cube.h"
+#include "camera.h"
+
 
 class Renderer
 {
@@ -27,7 +29,21 @@ public:
 
 
 private:
+	enum mouse_button
+	{
+		MOUSE_BUTTON_NONE = 0,
+		MOUSE_BUTTON_LEFT = (1 << 0),
+		MOUSE_BUTTON_RIGHT = (1 << 1),
+		MOUSE_BUTTON_MIDDLE = (1 << 2)
+	};
+
 	int _winWidth, _winHeight;
 
 	Shader _shader;
+
+	Mesh* _mesh;
+	Camera* _cam;
+
+	glm::vec2 _lastMouse;
+	int _mouseButtonFlags;
 };

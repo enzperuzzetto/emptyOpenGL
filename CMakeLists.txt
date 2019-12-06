@@ -38,11 +38,22 @@ set(SRC_FILES
 	include/renderer.h
 	include/glew.c
 	include/shader.h
+	include/camera.h
+	include/trackball.h
+	include/mesh.h
+	include/cube.h
+	
 		
 	#src
 	src/main.cpp
 	src/renderer.cpp
 	src/shader.cpp
+	src/camera.cpp
+	src/trackball.cpp
+	src/mesh.cpp
+	src/cube.cpp
+	ext/ObjFormat/ObjFormat.cpp
+    ext/ObjFormat/ObjUtil.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
