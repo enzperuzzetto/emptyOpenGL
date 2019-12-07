@@ -49,6 +49,7 @@ void Renderer::reshape(int width, int height)
 	//think to recompute viewport and matrix projection
 	_winWidth = width;
 	_winHeight = height;
+	_cam->reshape(width, height);
 }
 
 void Renderer::drawScene()
@@ -58,11 +59,9 @@ void Renderer::drawScene()
 
 	// draw all objects 
 	_shader.activate();
-	mat4 view = glm::lookAt(vec3(0.f, 0.f, 5.f), vec3(0.f,0.f,0.f), vec3(0.f, 1.f, 0.f));
-	mat4 persp = glm::perspective(45.f, (float)_winWidth / (float)_winHeight, 0.2f, 1000.f);
-	glUniformMatrix4fv(_shader.getUniformLocation("obj_mat"), 1, GL_FALSE, glm::value_ptr(mat4()));
-	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(view));//_cam->projectionMatrix()));
-	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(persp));//_cam->viewMatrix()));
+	glUniformMatrix4fv(_shader.getUniformLocation("obj_mat"), 1, GL_FALSE, glm::value_ptr(mat4(1.f)));
+	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(_cam->viewMatrix()));//_cam->projectionMatrix()));
+	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(_cam->projectionMatrix()));//_cam->viewMatrix()));
 	_mesh->draw(_shader);
 	_shader.deactivate();
 }
@@ -84,12 +83,10 @@ void Renderer::draw()
 
 void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 {
-	/*
 	switch (action)
 	{
 	case GLFW_PRESS:
 	{
-		//_mouseOrigin = _mouseCurrent;
 		_cam->trackball->start();
 		_cam->trackball->update(_lastMouse);
 		switch (button)
@@ -107,7 +104,6 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 		case GLFW_MOUSE_BUTTON_RIGHT:
 		{
 			_mouseButtonFlags |= MOUSE_BUTTON_RIGHT;
-			//_rotationOrigin = _rotationCurrent;
 		}
 		break;
 		}
@@ -119,7 +115,6 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 		{
 		case GLFW_MOUSE_BUTTON_LEFT:
 		{
-			//_rotationOrigin += radians(_mouseCurrent - _mouseOrigin);
 			_mouseButtonFlags &= ~MOUSE_BUTTON_LEFT;
 		}
 		break;
@@ -138,12 +133,10 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 	}
 	break;
 	}
-	*/
 }
 
 void Renderer::mouseMoved(int x, int y)
 {
-	/*
 	_lastMouse.x = x;
 	_lastMouse.y = y;
 	if (_cam->trackball->isTrack())
@@ -174,17 +167,15 @@ void Renderer::mouseMoved(int x, int y)
 			_cam->rotate(angle, normalize(axis));
 			break;
 		}
-
 		default:
 			break;
 		}
 	}
-	*/
 }
 
 void Renderer::mouseScroll(double x, double y)
 {
-	//_cam->zoom(y);
+	_cam->zoom(-y);
 }
 
 void Renderer::keyPressed(int key, int action, int mods)

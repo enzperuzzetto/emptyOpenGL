@@ -3,6 +3,9 @@
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtx\norm.hpp>
 
+constexpr auto ZOOM_STEP = 0.5f;
+constexpr auto TRANSLATE_STEP = 1.f;;
+
 using namespace glm;
 
 Camera::Camera() : 
@@ -67,30 +70,30 @@ void Camera::zoom(float t)
 {
 	vec3 dir = direction();
 	dir = normalize(dir);
-	vec3 tmp = dir * (6371.f * 2.f *  t * 0.25f);
-	_viewMatrix = glm::translate(_viewMatrix, tmp);
+	vec3 step = dir * ZOOM_STEP *  t;
+	_viewMatrix = inverse(glm::translate(mat4(1.f), step)) * _viewMatrix;
 }
 
 void Camera::rotateAroundTarget(float angle, vec3 axis)
 {
-	//mat4 rotate = glm::rotate(mat4(1.0f), angle, axis);
-	_viewMatrix = glm::rotate(_viewMatrix, angle, axis); //rotate * _viewMatrix;//
-	//_target = rodrigueRotation(_target, angle, axis);
+	vec3 dir = direction();
+	mat4 rotateMat = glm::rotate(mat4(1.0f), angle, axis);
+	mat4 translateMat = glm::translate(mat4(1.0f), dir);
+	_viewMatrix = inverse(translateMat * rotateMat * -translateMat) * _viewMatrix;
 }
 
 void Camera::rotate(float angle, glm::vec3 axis)
 {
-	vec3 dir = direction();
-	mat4 rotate = glm::rotate(mat4(1.0f), angle, axis);
-	mat4 translate = glm::translate(mat4(1.0f), _target);
-	_viewMatrix = translate * rotate * inverse(translate) * _viewMatrix;//glm::translate(glm::rotate(glm::translate(_viewMatrix, -dir), angle, axis), dir);
+	mat4 rotateMat = glm::rotate(mat4(1.0f), angle, axis);
+	_viewMatrix = inverse(rotateMat) * _viewMatrix;
+	_target = rodrigueRotation(_target, angle, axis);
 }
 
 void Camera::translate(glm::vec3 v)
 {
-	mat4 translate = glm::translate(mat4(1.0f), v * 6371.f * 0.14f);
-	_viewMatrix = translate * _viewMatrix;//glm::translate(_viewMatrix, v * 6371.f * 0.14f);
-	//_target += v;
+	mat4 translateMat = glm::translate(mat4(1.0f), v * TRANSLATE_STEP);
+	_viewMatrix = inverse(translateMat) * _viewMatrix;
+	_target += v * TRANSLATE_STEP;
 }
 
 
