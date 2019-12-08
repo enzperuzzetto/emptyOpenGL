@@ -1,7 +1,6 @@
 #pragma once
 #include "shader.h"
 #include "opengl.h"
-#include "cube.h"
 #include "camera.h"
 
 
@@ -41,7 +40,6 @@ private:
 
 	Shader _shader;
 
-	Mesh* _mesh;
 	Camera* _cam;
 
 	glm::vec2 _lastMouse;

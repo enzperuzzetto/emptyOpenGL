@@ -28,11 +28,7 @@ void Renderer::init(int width, int height)
 	_cam->lookAt(vec3(0.f, 0.f, -5.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
 
 	// init all object in scene
-	_mesh = new Mesh();
-	if (!_mesh->load(DATA_DIR"/models/cow.obj")) exit(1);
-	_mesh->computeNormals();
-	_mesh->initVBA();
-
+	
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -59,10 +55,12 @@ void Renderer::drawScene()
 
 	// draw all objects 
 	_shader.activate();
+	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(_cam->projectionMatrix()));
+	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(_cam->viewMatrix()));
+	
+	//draw all meshes
 	glUniformMatrix4fv(_shader.getUniformLocation("obj_mat"), 1, GL_FALSE, glm::value_ptr(mat4(1.f)));
-	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(_cam->viewMatrix()));//_cam->projectionMatrix()));
-	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(_cam->projectionMatrix()));//_cam->viewMatrix()));
-	_mesh->draw(_shader);
+
 	_shader.deactivate();
 }
 

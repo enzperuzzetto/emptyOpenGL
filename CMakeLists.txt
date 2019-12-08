@@ -40,8 +40,6 @@ set(SRC_FILES
 	include/shader.h
 	include/camera.h
 	include/trackball.h
-	include/mesh.h
-	include/cube.h
 	
 		
 	#src
@@ -50,10 +48,6 @@ set(SRC_FILES
 	src/shader.cpp
 	src/camera.cpp
 	src/trackball.cpp
-	src/mesh.cpp
-	src/cube.cpp
-	ext/ObjFormat/ObjFormat.cpp
-    ext/ObjFormat/ObjUtil.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
