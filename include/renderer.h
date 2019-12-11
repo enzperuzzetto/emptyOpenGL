@@ -1,9 +1,8 @@
 #pragma once
 #include "shader.h"
 #include "opengl.h"
-#include "cube.h"
-#include "camera.h"
 
+#include <glm\glm.hpp>
 
 class Renderer
 {
@@ -40,9 +39,6 @@ private:
 	int _winWidth, _winHeight;
 
 	Shader _shader;
-
-	Mesh* _mesh;
-	Camera* _cam;
 
 	glm::vec2 _lastMouse;
 	int _mouseButtonFlags;

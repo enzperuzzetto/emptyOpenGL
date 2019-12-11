@@ -23,16 +23,8 @@ void Renderer::init(int width, int height)
 
 	loadShaders();
 
-	_cam = new Camera(_winWidth, _winHeight);
-	_cam->setPerspective(45, 0.2f, 1000.f, (float)_winWidth / (float)_winHeight);
-	_cam->lookAt(vec3(0.f, 0.f, -5.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
-
 	// init all object in scene
-	_mesh = new Mesh();
-	if (!_mesh->load(DATA_DIR"/models/cow.obj")) exit(1);
-	_mesh->computeNormals();
-	_mesh->initVBA();
-
+	
 	glEnable(GL_DEPTH_TEST);
 }
 
@@ -49,7 +41,6 @@ void Renderer::reshape(int width, int height)
 	//think to recompute viewport and matrix projection
 	_winWidth = width;
 	_winHeight = height;
-	_cam->reshape(width, height);
 }
 
 void Renderer::drawScene()
@@ -59,10 +50,7 @@ void Renderer::drawScene()
 
 	// draw all objects 
 	_shader.activate();
-	glUniformMatrix4fv(_shader.getUniformLocation("obj_mat"), 1, GL_FALSE, glm::value_ptr(mat4(1.f)));
-	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(_cam->viewMatrix()));//_cam->projectionMatrix()));
-	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(_cam->projectionMatrix()));//_cam->viewMatrix()));
-	_mesh->draw(_shader);
+	
 	_shader.deactivate();
 }
 
@@ -87,8 +75,6 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 	{
 	case GLFW_PRESS:
 	{
-		_cam->trackball->start();
-		_cam->trackball->update(_lastMouse);
 		switch (button)
 		{
 		case GLFW_MOUSE_BUTTON_LEFT:
@@ -129,7 +115,6 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 		}
 		break;
 		}
-		_cam->trackball->end();
 	}
 	break;
 	}
@@ -137,45 +122,31 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 
 void Renderer::mouseMoved(int x, int y)
 {
-	_lastMouse.x = x;
-	_lastMouse.y = y;
-	if (_cam->trackball->isTrack())
+	switch (_mouseButtonFlags)
 	{
-		switch (_mouseButtonFlags)
-		{
-		case MOUSE_BUTTON_LEFT:
-		{
-			float angle;
-			vec3 axis;
-			_cam->trackball->trackRotate(ivec2(x, y), angle, axis);
-			_cam->rotateAroundTarget(angle, normalize(axis));
-			break;
-		}
-		case MOUSE_BUTTON_MIDDLE:
-		{
-			vec3 direction;
-			_cam->trackball->trackTranslate(ivec2(x, y), direction);
-			_cam->translate(direction);
-			break;
-		}
+	case MOUSE_BUTTON_LEFT:
+	{
+			
+		break;
+	}
+	case MOUSE_BUTTON_MIDDLE:
+	{
+			
+		break;
+	}
 
-		case MOUSE_BUTTON_RIGHT:
-		{
-			float angle;
-			vec3 axis;
-			_cam->trackball->trackRotate(ivec2(x, y), angle, axis);
-			_cam->rotate(angle, normalize(axis));
-			break;
-		}
-		default:
-			break;
-		}
+	case MOUSE_BUTTON_RIGHT:
+	{
+			
+		break;
+	}
+	default:
+		break;
 	}
 }
 
 void Renderer::mouseScroll(double x, double y)
 {
-	_cam->zoom(-y);
 }
 
 void Renderer::keyPressed(int key, int action, int mods)
