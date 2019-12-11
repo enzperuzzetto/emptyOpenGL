@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "cube.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -19,23 +20,27 @@ void Renderer::init(int width, int height)
 	_winWidth = width;
 	_winHeight = height;
 
-	glClearColor(0.4, 0.4, 0.4, 0.0);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 
 	loadShaders();
 
 	_cam = new Camera(_winWidth, _winHeight);
-	_cam->setPerspective(45, 0.2f, 1000.f, (float)_winWidth / (float)_winHeight);
-	_cam->lookAt(vec3(0.f, 0.f, -5.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+	_cam->setPerspective(45.f, 0.2f, 100.f, (float)_winWidth / (float)_winHeight);
+	_cam->lookAt(vec3(0.f, 0.f, -15.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
 
 	// init all object in scene
-	
+	Mesh* object1 = new Cube(10);
+	object1->init();
+	object1->setShader(_shader);
+	_meshes.push_back(object1);
+
 	glEnable(GL_DEPTH_TEST);
 }
 
 void Renderer::loadShaders()
 {
 	//load all shaders what do you want
-	_shader.loadFromFiles(DATA_DIR"/shaders/simple.vert", DATA_DIR"/shaders/simple.frag");
+	_shader.loadFromFiles(DATA_DIR"/Shaders/simple.vert", DATA_DIR"/Shaders/simple.frag");
 
 	checkError();
 }
@@ -46,6 +51,7 @@ void Renderer::reshape(int width, int height)
 	_winWidth = width;
 	_winHeight = height;
 	_cam->reshape(width, height);
+	glViewport(0, 0, _winWidth, _winHeight);
 }
 
 void Renderer::drawScene()
@@ -54,14 +60,9 @@ void Renderer::drawScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// draw all objects 
-	_shader.activate();
-	glUniformMatrix4fv(_shader.getUniformLocation("proj_mat"), 1, GL_FALSE, glm::value_ptr(_cam->projectionMatrix()));
-	glUniformMatrix4fv(_shader.getUniformLocation("view_mat"), 1, GL_FALSE, glm::value_ptr(_cam->viewMatrix()));
-	
-	//draw all meshes
-	glUniformMatrix4fv(_shader.getUniformLocation("obj_mat"), 1, GL_FALSE, glm::value_ptr(mat4(1.f)));
-
-	_shader.deactivate();
+	mat4 viewProjection = _cam->projectionMatrix() * _cam->viewMatrix();
+	for (auto mesh : _meshes)
+		mesh->render(viewProjection);
 }
 
 void Renderer::updateScene()

@@ -4,7 +4,7 @@
 #include <glm\gtx\norm.hpp>
 
 constexpr auto ZOOM_STEP = 0.5f;
-constexpr auto TRANSLATE_STEP = 1.f;;
+constexpr auto TRANSLATE_STEP = 0.5f;;
 
 using namespace glm;
 
@@ -50,18 +50,18 @@ void Camera::lookAt(vec3 pos, vec3 target, vec3 up)
 
 void Camera::setPerspective(float fov, float Near, float Far, float aspectRatio)
 {
-	_projectionMatrix = perspective(fov, aspectRatio, Near, Far);
+	_projectionMatrix = perspective<float>(fov, aspectRatio, Near, Far);
 	_fov = fov;
 	_near = Near;
 	_far = Far;
 }
 
-const mat4 Camera::projectionMatrix() const
+mat4 Camera::projectionMatrix() 
 {
 	return _projectionMatrix;
 }
 
-mat4 Camera::viewMatrix() const
+mat4 Camera::viewMatrix()
 {
 	return _viewMatrix;
 }
@@ -91,6 +91,7 @@ void Camera::rotate(float angle, glm::vec3 axis)
 
 void Camera::translate(glm::vec3 v)
 {
+	v.y = -v.y;
 	mat4 translateMat = glm::translate(mat4(1.0f), v * TRANSLATE_STEP);
 	_viewMatrix = inverse(translateMat) * _viewMatrix;
 	_target += v * TRANSLATE_STEP;

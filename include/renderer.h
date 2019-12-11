@@ -1,8 +1,7 @@
 #pragma once
 #include "shader.h"
-#include "opengl.h"
 #include "camera.h"
-
+#include "mesh.h"
 
 class Renderer
 {
@@ -42,6 +41,8 @@ private:
 
 	Camera* _cam;
 
+	std::vector<Mesh*> _meshes;
+
 	glm::vec2 _lastMouse;
-	int _mouseButtonFlags;
+	int _mouseButtonFlags = 0;
 };

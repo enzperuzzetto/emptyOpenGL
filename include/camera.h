@@ -13,8 +13,8 @@ public:
 	void lookAt(glm::vec3 pos, glm::vec3 target, glm::vec3 up);
 	void setPerspective(float fov, float Near, float Far, float aspectRatio);
 
-	const glm::mat4 projectionMatrix() const;
-	glm::mat4 viewMatrix() const;
+	glm::mat4 projectionMatrix();
+	glm::mat4 viewMatrix();
 
 	void zoom(float t);
 	void rotateAroundTarget(float angle, glm::vec3 axis);
