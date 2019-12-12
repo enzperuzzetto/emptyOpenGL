@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
 	while (!glfwWindowShouldClose(window)) {
 
 		//render here
-		pRender->drawScene();
+		pRender->draw();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

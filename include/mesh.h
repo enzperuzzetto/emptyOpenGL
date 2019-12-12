@@ -29,6 +29,7 @@ public:
 
 	virtual bool init();
 	virtual void render(glm::mat4 VP);
+	virtual void update(glm::mat4& mat) {};
 
 
 protected:

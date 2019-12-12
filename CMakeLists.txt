@@ -42,6 +42,7 @@ set(SRC_FILES
 	include/trackball.h
 	include/mesh.h
 	include/cube.h
+	include/line.h
 	
 		
 	#src
@@ -52,6 +53,7 @@ set(SRC_FILES
 	src/trackball.cpp
 	src/mesh.cpp
 	src/cube.cpp
+	src/line.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
