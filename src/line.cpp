@@ -13,20 +13,10 @@ Line::Line(glm::vec3 pos, glm::vec3 dir)
 	mIndices = { 0,1 };
 }
 
-void Line::update(glm::mat4& viewMatrix)
+void Line::update(const glm::mat4& mat)
 {
-	_modelMatrix= glm::inverse(viewMatrix);
-	
-	/*
-	glm::vec3 orign = glm::inverse(viewMatrix)[3];
-	glm::vec3 direction = viewMatrix[2];
-	mVertices[0].position = orign;
-	mVertices[1].position = orign + direction * LINE_LENGHT;
-	*/
-	_modelMatrix = glm::translate(_modelMatrix, glm::vec3(0.5f, 0.f, 0.f));
+	_modelMatrix = mat;
 }
-
-
 
 void Line::draw()
 {

@@ -12,6 +12,7 @@ public:
 	void reshape(int width, int height);
 	void lookAt(glm::vec3 pos, glm::vec3 target, glm::vec3 up);
 	void setPerspective(float fov, float Near, float Far, float aspectRatio);
+	void setPerspective(glm::mat4& proj) { _projectionMatrix = proj; }
 
 	glm::mat4 projectionMatrix();
 	glm::mat4 viewMatrix();

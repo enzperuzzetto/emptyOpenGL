@@ -22,3 +22,8 @@ Cube::Cube(float size)
 		0,4,7,7,3,0
 	};
 }
+
+void Cube::update(const glm::mat4& mat)
+{
+	_modelMatrix = mat;
+}

@@ -8,6 +8,7 @@ include_directories(ext/glfw/include)
 include_directories(ext/glm)
 include_directories(ext)
 include_directories(include)
+include_directories(ext/OVR/include)
 
 if (APPLE)
   set(CMAKE_MACOSX_RPATH ON)
@@ -43,8 +44,10 @@ set(SRC_FILES
 	include/mesh.h
 	include/cube.h
 	include/line.h
-	
-		
+	include/oculusvr.h
+	include/ovrUtils.h
+	include/meshController.h
+			
 	#src
 	src/main.cpp
 	src/renderer.cpp
@@ -54,6 +57,8 @@ set(SRC_FILES
 	src/mesh.cpp
 	src/cube.cpp
 	src/line.cpp
+	src/oculusvr.cpp
+	src/meshController.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
@@ -61,13 +66,19 @@ add_definitions(-DDATA_DIR="${PROJECT_SOURCE_DIR}/data")
 
 add_library(glew STATIC include/glew.c)
 
+add_library(libOVR_debug STATIC IMPORTED)
+set_target_properties(libOVR_debug PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/ext/OVR/lib/Debug/LibOVR.lib")
+add_library(libOVR_release STATIC IMPORTED)
+set_target_properties(libOVR_release PROPERTIES IMPORTED_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/ext/OVR/lib/Release/LibOVR.lib")
+
 add_executable(emptyGL ${SRC_FILES})
 
 target_link_libraries(
 				emptyGL
 				glew
 				glfw
-				${GLFW_LIBRARIES})
+				${GLFW_LIBRARIES}
+				debug libOVR_debug optimized libOVR_release)
 
 #file(GLOB SHADERS "data/shaders/*.vert" "data/shaders/*.frag")
 #IndicateExternalFile("native-ogl" ${SHADERS})

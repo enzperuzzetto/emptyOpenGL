@@ -2,9 +2,11 @@
 #include "cube.h"
 #include "line.h"
 
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
+using namespace OVR;
 
 Renderer::Renderer() :
 	_winWidth(0),
@@ -25,21 +27,34 @@ void Renderer::init(int width, int height)
 
 	loadShaders();
 
-	_cam = new Camera(_winWidth, _winHeight);
-	_cam->setPerspective(45.f, 0.2f, 100.f, (float)_winWidth / (float)_winHeight);
-	_cam->lookAt(vec3(0.f, 0.f, -15.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+	_oculusVR = new OculusVR();
+
+	if (!_oculusVR->initVR())
+	{
+		assert(("Failed to initialize vr", false));
+	}
+
+	if (!_oculusVR->initBufferVR(_winWidth, _winHeight))
+	{
+		assert(("Failed to initialize buffer vr", false));
+	}
+
+	_oculusVR->setProjection(0.2f, 100.f);
+	_oculusVR->activateAim(true);
+
+	for (unsigned int i = 0; i < 2; i++)
+	{
+		_cam[i] = new Camera(_winWidth, _winHeight);
+		_cam[i]->setPerspective(_oculusVR->getProjection(i));
+		_cam[i]->lookAt(vec3(0.f, 0.f, -20.f) , vec3(0.f), vec3(0.f, 1.f, 0.f));
+	}
 
 	// init all object in scene
 	Mesh* object1 = new Cube(10);
 	object1->init();
 	object1->setShader(_shader);
 
-	Mesh* line = new Line(vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, -1.f));
-	line->init();
-	line->setShader(_shader);
-
 	_meshes.push_back(object1);
-	_meshes.push_back(line);
 
 	glEnable(GL_DEPTH_TEST);
 }
@@ -57,8 +72,8 @@ void Renderer::reshape(int width, int height)
 	//think to recompute viewport and matrix projection
 	_winWidth = width;
 	_winHeight = height;
-	_cam->reshape(width, height);
-	glViewport(0, 0, _winWidth, _winHeight);
+	for(auto& cam : _cam)
+		cam->reshape(width, height);
 }
 
 void Renderer::drawScene()
@@ -67,15 +82,46 @@ void Renderer::drawScene()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// draw all objects 
-	mat4 viewProjection = _cam->projectionMatrix() * _cam->viewMatrix();
-	for (auto mesh : _meshes)
-		mesh->render(viewProjection);
+	ovrSessionStatus sessionStatus = _oculusVR->getSessionStatus();
+	
+	if (sessionStatus.IsVisible)
+	{
+		_oculusVR->tracking();
+
+		for (unsigned int i = 0; i < ovrEye_Count; i++)
+		{
+			
+
+			_oculusVR->onRender(i);
+
+			mat4 eyeInSpace = _oculusVR->getEyeInSpace(i);
+			const mat4 currentViewProjection = _cam[i]->projectionMatrix() * (glm::inverse(eyeInSpace) *  _cam[i]->viewMatrix());
+			_oculusVR->updateControllers(glm::inverse(eyeInSpace) * _cam[i]->viewMatrix());
+
+			for (auto& mesh : _meshes)
+				mesh->render(currentViewProjection);
+
+			
+			ovrInputState inputState;
+			if (_oculusVR->inputControllers(inputState))
+			{
+				//callback button
+				//inputOculus(inputState);
+			}
+			
+			_oculusVR->renderControllers(currentViewProjection);
+
+			_oculusVR->onRenderFinish(i);
+		}
+
+		_oculusVR->submitFrame();
+		_oculusVR->blitMirror(_winWidth, _winHeight);
+	}
 }
 
 void Renderer::updateScene()
 {
 	// update all objects
-	_meshes[1]->update(_cam->viewMatrix());
 }
 
 void Renderer::draw()
@@ -94,8 +140,8 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 	{
 	case GLFW_PRESS:
 	{
-		_cam->trackball->start();
-		_cam->trackball->update(_lastMouse);
+		_cam[0]->trackball->start();
+		_cam[0]->trackball->update(_lastMouse);
 		switch (button)
 		{
 		case GLFW_MOUSE_BUTTON_LEFT:
@@ -136,7 +182,7 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 		}
 		break;
 		}
-		_cam->trackball->end();
+		_cam[0]->trackball->end();
 	}
 	break;
 	}
@@ -146,7 +192,7 @@ void Renderer::mouseMoved(int x, int y)
 {
 	_lastMouse.x = x;
 	_lastMouse.y = y;
-	if (_cam->trackball->isTrack())
+	if (_cam[0]->trackball->isTrack())
 	{
 		switch (_mouseButtonFlags)
 		{
@@ -154,15 +200,18 @@ void Renderer::mouseMoved(int x, int y)
 		{
 			float angle;
 			vec3 axis;
-			_cam->trackball->trackRotate(ivec2(x, y), angle, axis);
-			_cam->rotateAroundTarget(angle, normalize(axis));
+			_cam[0]->trackball->trackRotate(ivec2(x, y), angle, axis);
+			for (auto& cam : _cam)
+				cam->rotateAroundTarget(angle, normalize(axis));
+			
 			break;
 		}
 		case MOUSE_BUTTON_MIDDLE:
 		{
 			vec3 direction;
-			_cam->trackball->trackTranslate(ivec2(x, y), direction);
-			_cam->translate(direction);
+			_cam[0]->trackball->trackTranslate(ivec2(x, y), direction);
+			for (auto& cam : _cam)
+				cam->translate(direction);
 			break;
 		}
 
@@ -170,8 +219,9 @@ void Renderer::mouseMoved(int x, int y)
 		{
 			float angle;
 			vec3 axis;
-			_cam->trackball->trackRotate(ivec2(x, y), angle, axis);
-			_cam->rotate(angle, normalize(axis));
+			_cam[0]->trackball->trackRotate(ivec2(x, y), angle, axis);
+			for (auto& cam : _cam)
+				cam->rotate(angle, normalize(axis));
 			break;
 		}
 		default:
@@ -182,11 +232,31 @@ void Renderer::mouseMoved(int x, int y)
 
 void Renderer::mouseScroll(double x, double y)
 {
-	_cam->zoom(-y);
+	for (auto& cam : _cam)
+		cam->zoom(-y);
 }
 
 void Renderer::keyPressed(int key, int action, int mods)
 {
+	if (action == GLFW_PRESS)
+	{
+		switch (key)
+		{
+		case GLFW_KEY_SPACE:
+		{
+			if (_oculusVR->reset())
+			{
+				for (unsigned int i = 0; i < 2; i++)
+				{
+					_cam[i]->lookAt(vec3(0.f, 0.f, -20.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+				}
+			}
+			break;
+		}
+		default:
+			break;
+		}
+	}
 }
 
 void Renderer::charPressed(int key)

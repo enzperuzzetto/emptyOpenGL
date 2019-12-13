@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
+#include "oculusvr.h"
 
 class Renderer
 {
@@ -39,7 +40,8 @@ private:
 
 	Shader _shader;
 
-	Camera* _cam;
+	OculusVR* _oculusVR;
+	Camera* _cam[2];
 
 	std::vector<Mesh*> _meshes;
 

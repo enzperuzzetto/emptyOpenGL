@@ -28,8 +28,8 @@ public:
 	void setShader(Shader& shader) { _shader = &shader; }
 
 	virtual bool init();
-	virtual void render(glm::mat4 VP);
-	virtual void update(glm::mat4& mat) {};
+	virtual void render(const glm::mat4 VP);
+	virtual void update(const glm::mat4& mat) {};
 
 
 protected:
