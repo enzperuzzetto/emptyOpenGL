@@ -74,7 +74,7 @@ private:
 		OVRController();
 		void init();
 		void render(const glm::mat4& VP);
-		void update(const glm::mat4& mat);
+		void update(const glm::vec3& headPosePhysic, const glm::vec3& headPoseVr);
 		bool callback(const ovrSession& session, ovrInputState& inputState);
 		void setPosOrientation(const ovrPosef& pose, unsigned int handIndex);
 		void setRenderLine(bool activate);
@@ -89,6 +89,7 @@ private:
 	ovrSession				m_hmdSession;
 	ovrHmdDesc				m_hmdDesc;
 	ovrTrackingState		m_trackingState;
+	ovrPosef				m_headPose;
 	ovrMirrorTexture	    m_mirrorTexture;
 	ovrMirrorTextureDesc	m_mirrorDesc;
 	GLuint					m_mirrorFBO;

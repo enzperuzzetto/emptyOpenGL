@@ -118,7 +118,8 @@ void OculusVR::tracking()
 		else
 			m_controllers.isTrack(i, false);
 	}
-		
+	
+	m_headPose = trackState.HeadPose.ThePose;
 
 	for (unsigned int i = 0; i < ovrEye_Count; i++)
 	{
@@ -151,8 +152,7 @@ void OculusVR::onRenderFinish(unsigned int eyeIndex)
 
 void OculusVR::updateControllers(const glm::mat4& viewMatrix)
 {	
-	glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3(0.f,0.f,-20.f));
-	m_controllers.update(viewMatrix);
+	m_controllers.update(ovr::toGlm(m_headPose.Position), viewMatrix[3]);
 }
 
 void OculusVR::activateAim(bool activate)
@@ -379,13 +379,14 @@ void OculusVR::OVRController::render(const glm::mat4& VP)
 	}
 }
 
-void OculusVR::OVRController::update(const glm::mat4& mat)
+void OculusVR::OVRController::update(const glm::vec3& headPosePhysic, const glm::vec3& headPoseVr)
 {
 	for (unsigned short i = 0; i < 2; i++)
 	{
-		glm::mat4 translation = glm::translate(glm::mat4(1.f), glm::vec3(glm::inverse(mat)[3]));
-		glm::mat4 controllerPose = ovr::toGlm(m_hand[i]);
-		m_meshControllers[i]->update(translation * controllerPose);
+		glm::mat4 translationMat = glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 20.f));
+		glm::mat4 handPose = ovr::toGlm(m_hand[i]);
+		glm::mat4 orientationMat = glm::rotate(glm::mat4(1.f), glm::radians(180.f), glm::vec3(0.f, 1.f, 0.f));
+		m_meshControllers[i]->update(translationMat * handPose * orientationMat);
 	}
 }
 
@@ -397,8 +398,6 @@ bool OculusVR::OVRController::callback(const ovrSession& session, ovrInputState&
 void OculusVR::OVRController::setPosOrientation(const ovrPosef& pose, unsigned int handIndex)
 {
 	m_hand[handIndex] = pose;
-	m_meshControllers[handIndex]->update(ovr::toGlm(m_hand[handIndex]));
-
 }
 void OculusVR::OVRController::setRenderLine(bool activate)
 {

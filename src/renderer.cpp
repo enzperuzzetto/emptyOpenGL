@@ -46,7 +46,7 @@ void Renderer::init(int width, int height)
 	{
 		_cam[i] = new Camera(_winWidth, _winHeight);
 		_cam[i]->setPerspective(_oculusVR->getProjection(i));
-		_cam[i]->lookAt(vec3(0.f, 0.f, -20.f) , vec3(0.f), vec3(0.f, 1.f, 0.f));
+		_cam[i]->lookAt(vec3(0.f, 0.f, 20.f) , vec3(0.f), vec3(0.f, 1.f, 0.f));
 	}
 
 	// init all object in scene
@@ -248,7 +248,7 @@ void Renderer::keyPressed(int key, int action, int mods)
 			{
 				for (unsigned int i = 0; i < 2; i++)
 				{
-					_cam[i]->lookAt(vec3(0.f, 0.f, -20.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+					_cam[i]->lookAt(vec3(0.f, 0.f, 20.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
 				}
 			}
 			break;
