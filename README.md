@@ -5,12 +5,14 @@ Each branches give an improve on the base emptyOpenGL project.
 
 ## Branch
 
-- **Master** branch is a base of this project.
+- **Master** branch is a base of this project. It contain just the minimum to get window with OpenGL context.
 - **Camera_trackball** branch improve master branch with perspective camera.
+- **Camera_mesh** branch improve camera_trackball with mesh object to compose your scene.
+- **oculusRift** branch is integration of oculusRift with native OpenGL/C++.
 
 ## Dependences
 
 This project is develop with GLM, GLFW and GLEW.
 
 
-> **Note:** this project is in development. last update 08/12/2019
+> **Note:** last update 20/12/2019.
