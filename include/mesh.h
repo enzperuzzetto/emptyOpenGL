@@ -16,14 +16,7 @@ public:
 	{
 	}
 
-	virtual ~Mesh()
-	{
-		if (_isInitialized)
-		{
-			glDeleteBuffers(1, &_vbo);
-			glDeleteBuffers(1, &_ebo);
-		}
-	}
+	virtual ~Mesh();
 
 	void setShader(Shader& shader) { _shader = &shader; }
 

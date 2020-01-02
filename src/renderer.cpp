@@ -31,15 +31,10 @@ void Renderer::init(int width, int height)
 
 	// init all object in scene
 	Mesh* object1 = new Cube(10);
-	object1->init();
 	object1->setShader(_shader);
-
-	Mesh* line = new Line(vec3(0.f, 0.f, 0.f), vec3(0.f, 0.f, -1.f));
-	line->init();
-	line->setShader(_shader);
-
+	object1->init();
+	
 	_meshes.push_back(object1);
-	_meshes.push_back(line);
 
 	glEnable(GL_DEPTH_TEST);
 }
@@ -75,7 +70,7 @@ void Renderer::drawScene()
 void Renderer::updateScene()
 {
 	// update all objects
-	_meshes[1]->update(_cam->viewMatrix());
+	
 }
 
 void Renderer::draw()
