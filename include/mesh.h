@@ -3,6 +3,7 @@
 #include <glm\glm.hpp>
 
 #include "opengl.h"
+#include "boundingVolume.h"
 
 class Shader;
 
@@ -24,11 +25,13 @@ public:
 	virtual void render(glm::mat4 VP);
 	virtual void update(glm::mat4& mat) {};
 
+	BoundingVolume* _bv;
 
 protected:
 	virtual void draw();
 
 	bool _isInitialized;
+	bool _drawBV = true;
 
 	unsigned int _vao;
 	unsigned int _ebo;

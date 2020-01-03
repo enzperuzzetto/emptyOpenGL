@@ -21,4 +21,13 @@ Cube::Cube(float size)
 		1,5,6,6,2,1,
 		0,4,7,7,3,0
 	};
+
+	_bv = new AABB(glm::vec3(size / 2), glm::vec3(size / 2));
+	_bv->init();
+}
+
+void Cube::update(glm::mat4& mat)
+{
+	_modelMatrix = mat * _modelMatrix;
+	_bv->update(_modelMatrix);
 }

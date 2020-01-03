@@ -43,7 +43,8 @@ set(SRC_FILES
 	include/mesh.h
 	include/cube.h
 	include/line.h
-	
+	include/boundingVolume.h
+	include/ray.h	
 		
 	#src
 	src/main.cpp
@@ -54,6 +55,8 @@ set(SRC_FILES
 	src/mesh.cpp
 	src/cube.cpp
 	src/line.cpp
+	src/boundingVolume.cpp
+	
 )
 
 add_definitions(-DGLEW_STATIC)

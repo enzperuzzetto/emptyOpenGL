@@ -1,5 +1,6 @@
 #include "mesh.h"
 #include "shader.h"
+#include "boundingVolume.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -35,7 +36,7 @@ bool Mesh::init()
 	glGenBuffers(1, &_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	// copy the data from host's RAM to GPU's video memory:
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mVertices.size(), mVertices.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * mVertices.size(), mVertices.data(), GL_STATIC_DRAW);
 
 	glGenBuffers(1, &_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _ebo);
@@ -79,6 +80,7 @@ bool Mesh::init()
 		glEnableVertexAttribArray(vertex_texcoord_loc);
 	}
 
+	glBindVertexArray(0);
 	_isInitialized = true;
 
 	return _isInitialized;
@@ -110,5 +112,8 @@ void Mesh::render(glm::mat4 VP)
 	draw();
 
 	_shader->deactivate();
+
+	if (_drawBV)
+		_bv->render(VP);
 }
 

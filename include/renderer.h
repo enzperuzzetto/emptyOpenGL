@@ -45,4 +45,5 @@ private:
 
 	glm::vec2 _lastMouse;
 	int _mouseButtonFlags = 0;
+	long long _nbFrame = 0;
 };

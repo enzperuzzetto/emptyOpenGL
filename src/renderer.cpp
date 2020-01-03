@@ -27,14 +27,21 @@ void Renderer::init(int width, int height)
 
 	_cam = new Camera(_winWidth, _winHeight);
 	_cam->setPerspective(45.f, 0.2f, 100.f, (float)_winWidth / (float)_winHeight);
-	_cam->lookAt(vec3(0.f, 0.f, -15.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+	_cam->lookAt(vec3(0.f, 10.f, -25.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
 
 	// init all object in scene
 	Mesh* object1 = new Cube(10);
 	object1->setShader(_shader);
 	object1->init();
-	
+
 	_meshes.push_back(object1);
+
+	Mesh* object2 = new Cube(10);
+	object2->setShader(_shader);
+	object2->init();
+	object2->update(translate(mat4(1.f), vec3(12.f, 0.f, 0.f)));
+	
+	_meshes.push_back(object2);
 
 	glEnable(GL_DEPTH_TEST);
 }
@@ -70,13 +77,26 @@ void Renderer::drawScene()
 void Renderer::updateScene()
 {
 	// update all objects
-	
+	_meshes[0]->update(glm::rotate_slow(mat4(1.f), radians(.05f), glm::vec3(0.f, 1.f, 0.f)));
+	BoundingVolume* b0 = _meshes[0]->_bv;
+	BoundingVolume* b1 = _meshes[1]->_bv;
+	if (b1->intersect(*b0))
+	{
+		_meshes[0]->_bv->inColision = true;
+		_meshes[1]->_bv->inColision = true;
+	}
+	else
+	{
+		_meshes[0]->_bv->inColision = false;
+		_meshes[1]->_bv->inColision = false;
+	}
 }
 
 void Renderer::draw()
 {
 	updateScene();
 	drawScene();
+	_nbFrame++;
 }
 
 
@@ -145,6 +165,7 @@ void Renderer::mouseMoved(int x, int y)
 	{
 		switch (_mouseButtonFlags)
 		{
+			/*
 		case MOUSE_BUTTON_LEFT:
 		{
 			float angle;
@@ -153,6 +174,7 @@ void Renderer::mouseMoved(int x, int y)
 			_cam->rotateAroundTarget(angle, normalize(axis));
 			break;
 		}
+		*/
 		case MOUSE_BUTTON_MIDDLE:
 		{
 			vec3 direction;
