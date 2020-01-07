@@ -16,6 +16,7 @@ public:
 
 	glm::vec3 at(float t) const { return _origin + t * _direction; }
 	bool foundIntersection() const { return _t < std::numeric_limits<float>::max(); }
+	float t() { return _t; }
 
 	void setT(float t) { _t = t; }
 	glm::vec3 positionOfIntersection() { return at(_t); }

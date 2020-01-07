@@ -78,12 +78,12 @@ void Renderer::updateScene()
 {
 	// update all objects
 	_meshes[0]->update(glm::rotate_slow(mat4(1.f), radians(.05f), glm::vec3(0.f, 1.f, 0.f)));
+	/*
 	if (_meshes[0]->intersect(*_meshes[1]))
 	{
 		_meshes[0]->setInColision(true);
 		_meshes[1]->setInColision(true);
 	}
-	/*
 	else
 	{
 		if (_meshes[0]->inColision() && _meshes[1]->inColision())
@@ -91,8 +91,8 @@ void Renderer::updateScene()
 			_meshes[0]->setInColision(false);
 			_meshes[1]->setInColision(false);
 		}
-	}*/
-	
+	}
+	*/
 }
 
 void Renderer::draw()
@@ -128,13 +128,20 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 			line->init();
 			_meshes.push_back(line);
 			
+			float tmin = FLT_MAX;
+			Mesh* shape = nullptr;
 			for (auto& mesh : _meshes)
 			{
 				if (mesh->intersect(raycast))
-					mesh->setInColision(!mesh->inColision());
-				else
-					std::cout << "no intersect\n";
+				{
+					if (tmin > raycast.t())
+					{
+						tmin = raycast.t();
+						shape = raycast.shape();
+					}
+				}
 			}
+			shape->setInColision(!shape->inColision());
 		}
 		break;
 		case GLFW_MOUSE_BUTTON_MIDDLE:

@@ -62,29 +62,29 @@ bool AABB::intersect(Ray& ray)
 	glm::vec3 min = center - radius;
 	glm::vec3 max = center + radius;
 	
-	float tmin = 0.0f;
-	float tmax = FLT_MAX;
-	for (int i = 0; i < 3; i++) {
+	float t1 = (min.x - ray_origin.x) / ray_direction.x;
+	float t2 = (max.x - ray_origin.x) / ray_direction.x;
+	float t3 = (min.y - ray_origin.y) / ray_direction.y;
+	float t4 = (max.y - ray_origin.y) / ray_direction.y;
+	float t5 = (min.z - ray_origin.z) / ray_direction.z;
+	float t6 = (max.z - ray_origin.z) / ray_direction.z;
 
-		if (std::fabs(ray_direction[i]) < std::numeric_limits<float>::epsilon()) {
-			// Ray is parallel to slab. No hit if origin not within slab
-			if (ray_origin[i] < min[i] || ray_origin[i] > max[i]) return 0;
-		}
-		else {
-			// Compute intersection t value of ray with near and far plane of slab
-			float ood = 1.0f / ray_direction[i];
-			float t1 = (min[i] - ray_origin[i]) * ood;
-			float t2 = (max[i] - ray_origin[i]) * ood;
-			// Make t1 be intersection with near plane, t2 with far plane
-			if (t1 > t2) std::swap(t1, t2);
-			// Compute the intersection of slab intersection intervals
-			if (t1 > tmin) tmin = t1;
-			if (t2 > tmax) tmax = t2;
-			// Exit with no collision as soon as slab intersection becomes empty
-			if (tmin > tmax) return 0;
-		}
+	float tmin = fmaxf(fmaxf(fminf(t1, t2), fminf(t3, t4)), fminf(t5, t6));
+	float tmax = fminf(fminf(fmaxf(t1, t2), fmaxf(t3, t4)), fmaxf(t5, t6));
+
+	// if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+	if (tmax < 0) {
+		return false;
 	}
 
+	// if tmin > tmax, ray doesn't intersect AABB
+	if (tmin > tmax) {
+		return false;
+	}
+
+	if (tmin < 0.f) {
+		ray.setT(tmax);
+	}
 	ray.setT(tmin);
 
 	return true;

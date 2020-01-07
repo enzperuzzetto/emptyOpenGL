@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include "shader.h"
 #include "boundingVolume.h"
+#include "ray.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -121,7 +122,12 @@ bool Mesh::intersect(Ray& ray)
 {
 	if (_bv == nullptr)
 		return false;
-	return _bv->intersect(ray);
+	if (_bv->intersect(ray))
+	{
+		ray.setShape(this);
+		return true;
+	}
+	return false;
 }
 
 bool Mesh::intersect(Mesh& mesh)
