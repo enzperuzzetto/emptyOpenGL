@@ -58,10 +58,10 @@ bool AABB::intersect(Ray& ray)
 {
 	glm::vec3 ray_origin = ray.origin();
 	glm::vec3 ray_direction = ray.direction();
-
+	
 	glm::vec3 min = center - radius;
 	glm::vec3 max = center + radius;
-
+	
 	float tmin = 0.0f;
 	float tmax = FLT_MAX;
 	for (int i = 0; i < 3; i++) {

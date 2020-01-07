@@ -78,18 +78,21 @@ void Renderer::updateScene()
 {
 	// update all objects
 	_meshes[0]->update(glm::rotate_slow(mat4(1.f), radians(.05f), glm::vec3(0.f, 1.f, 0.f)));
-	BoundingVolume* b0 = _meshes[0]->_bv;
-	BoundingVolume* b1 = _meshes[1]->_bv;
-	if (b1->intersect(*b0))
+	if (_meshes[0]->intersect(*_meshes[1]))
 	{
-		_meshes[0]->_bv->inColision = true;
-		_meshes[1]->_bv->inColision = true;
+		_meshes[0]->setInColision(true);
+		_meshes[1]->setInColision(true);
 	}
+	/*
 	else
 	{
-		_meshes[0]->_bv->inColision = false;
-		_meshes[1]->_bv->inColision = false;
-	}
+		if (_meshes[0]->inColision() && _meshes[1]->inColision())
+		{
+			_meshes[0]->setInColision(false);
+			_meshes[1]->setInColision(false);
+		}
+	}*/
+	
 }
 
 void Renderer::draw()
@@ -116,6 +119,22 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 		case GLFW_MOUSE_BUTTON_LEFT:
 		{
 			_mouseButtonFlags |= MOUSE_BUTTON_LEFT;
+			double xpos, ypos;
+			//getting cursor position
+			glfwGetCursorPos(window, &xpos, &ypos);
+			Ray raycast = throwRayIntoWorld(xpos, ypos);
+			Mesh* line = new Line(raycast.origin(), raycast.direction());
+			line->setShader(_shader);
+			line->init();
+			_meshes.push_back(line);
+			
+			for (auto& mesh : _meshes)
+			{
+				if (mesh->intersect(raycast))
+					mesh->setInColision(!mesh->inColision());
+				else
+					std::cout << "no intersect\n";
+			}
 		}
 		break;
 		case GLFW_MOUSE_BUTTON_MIDDLE:
@@ -165,16 +184,10 @@ void Renderer::mouseMoved(int x, int y)
 	{
 		switch (_mouseButtonFlags)
 		{
-			/*
 		case MOUSE_BUTTON_LEFT:
 		{
-			float angle;
-			vec3 axis;
-			_cam->trackball->trackRotate(ivec2(x, y), angle, axis);
-			_cam->rotateAroundTarget(angle, normalize(axis));
 			break;
 		}
-		*/
 		case MOUSE_BUTTON_MIDDLE:
 		{
 			vec3 direction;
@@ -208,4 +221,29 @@ void Renderer::keyPressed(int key, int action, int mods)
 
 void Renderer::charPressed(int key)
 {
+}
+
+Ray Renderer::throwRayIntoWorld(float x, float y)
+{
+	vec4 ray_origine_NDC((x / (float)_winWidth - 0.5f) * 2.0f, (0.5f - y / (float)_winHeight) * 2.0f,
+		-1.0,
+		1.0f
+	);
+	glm::vec4 ray_end_NDC(
+		(x / (float)_winWidth - 0.5f) * 2.0f,
+		(0.5f - y / (float)_winHeight) * 2.0f,
+		0.0,
+		1.0f
+	);
+	mat4 toWorld = inverse(_cam->projectionMatrix() * _cam->viewMatrix());
+
+	vec4 ray_origin_world = toWorld * ray_origine_NDC;
+	ray_origin_world /= ray_origin_world.w;
+	
+	vec4 ray_end_world = toWorld * ray_end_NDC;
+	ray_end_world /= ray_end_world.w;
+
+	vec3 ray_direction = normalize(vec3(ray_end_world - ray_origin_world));
+
+	return Ray(vec3(ray_origin_world), ray_direction);
 }

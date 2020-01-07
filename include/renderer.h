@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "mesh.h"
+#include "ray.h"
 
 class Renderer
 {
@@ -27,6 +28,9 @@ public:
 
 
 private:
+
+	Ray throwRayIntoWorld(float x, float y);
+
 	enum mouse_button
 	{
 		MOUSE_BUTTON_NONE = 0,

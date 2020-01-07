@@ -13,19 +13,24 @@ public:
 	Mesh() :
 		_isInitialized(false),
 		_modelMatrix(glm::mat4(1.f)),
-		_shader(nullptr)
+		_shader(nullptr),
+		_bv(nullptr)
 	{
 	}
 
 	virtual ~Mesh();
 
 	void setShader(Shader& shader) { _shader = &shader; }
+	bool inColision() { return _bv->inColision; }
+	void setInColision(bool value) { _bv->inColision = value; }
+	BoundingVolume* getBoundingVolume() { return _bv; }
 
 	virtual bool init();
 	virtual void render(glm::mat4 VP);
 	virtual void update(glm::mat4& mat) {};
 
-	BoundingVolume* _bv;
+	virtual bool intersect(Ray& ray);
+	virtual bool intersect(Mesh& mesh);
 
 protected:
 	virtual void draw();
@@ -40,6 +45,7 @@ protected:
 	glm::mat4 _modelMatrix;
 
 	Shader* _shader;
+	BoundingVolume* _bv;
 
 	struct Vertex
 	{

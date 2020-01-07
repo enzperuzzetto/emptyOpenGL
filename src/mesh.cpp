@@ -113,7 +113,21 @@ void Mesh::render(glm::mat4 VP)
 
 	_shader->deactivate();
 
-	if (_drawBV)
+	if (_drawBV && _bv != nullptr)
 		_bv->render(VP);
+}
+
+bool Mesh::intersect(Ray& ray)
+{
+	if (_bv == nullptr)
+		return false;
+	return _bv->intersect(ray);
+}
+
+bool Mesh::intersect(Mesh& mesh)
+{
+	if (_bv == nullptr || mesh.getBoundingVolume() == nullptr)
+		return false;
+	return _bv->intersect(*mesh.getBoundingVolume());
 }
 
