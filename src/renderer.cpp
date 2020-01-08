@@ -2,6 +2,9 @@
 #include "cube.h"
 #include "line.h"
 
+#include <chrono>
+#include <stdlib.h> 
+#include <time.h>
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
@@ -26,22 +29,27 @@ void Renderer::init(int width, int height)
 	loadShaders();
 
 	_cam = new Camera(_winWidth, _winHeight);
-	_cam->setPerspective(45.f, 0.2f, 100.f, (float)_winWidth / (float)_winHeight);
-	_cam->lookAt(vec3(0.f, 10.f, -25.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
+	_cam->setPerspective(45.f, 0.2f, 1000.f, (float)_winWidth / (float)_winHeight);
+	_cam->lookAt(vec3(0.f, 10.f, -110.f), vec3(0.f), vec3(0.f, 1.f, 0.f));
 
 	// init all object in scene
-	Mesh* object1 = new Cube(10);
-	object1->setShader(_shader);
-	object1->init();
+	srand(time(NULL));
+	for (int i = 0; i < 1000; i++)
+	{
+		Mesh* object = new Cube(2);
+		object->setShader(_shader);
+		object->init();
+		float x = (float)(rand() % 200) - 100.f;
+		float y = (float)(rand() % 200) - 100.f;
+		float z = (float)(rand() % 200) - 100.f;
+		object->update(translate(mat4(1.f), vec3(x, y, z)));
+		_meshes.push_back(object);
+	}
 
-	_meshes.push_back(object1);
-
-	Mesh* object2 = new Cube(10);
-	object2->setShader(_shader);
-	object2->init();
-	object2->update(translate(mat4(1.f), vec3(12.f, 0.f, 0.f)));
-	
-	_meshes.push_back(object2);
+	auto start = std::chrono::high_resolution_clock::now();
+	_octree = new Octree(new AABB(glm::vec3(0.f), glm::vec3(100.f)), _meshes);
+	_octree->buildTree();
+	std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ms " << std::endl;
 
 	glEnable(GL_DEPTH_TEST);
 }
@@ -72,12 +80,14 @@ void Renderer::drawScene()
 	mat4 viewProjection = _cam->projectionMatrix() * _cam->viewMatrix();
 	for (auto mesh : _meshes)
 		mesh->render(viewProjection);
+
+	_octree->render(viewProjection);
 }
 
 void Renderer::updateScene()
 {
 	// update all objects
-	_meshes[0]->update(glm::rotate_slow(mat4(1.f), radians(.05f), glm::vec3(0.f, 1.f, 0.f)));
+	//_meshes[0]->update(glm::rotate_slow(mat4(1.f), radians(.05f), glm::vec3(0.f, 1.f, 0.f)));
 	/*
 	if (_meshes[0]->intersect(*_meshes[1]))
 	{
@@ -127,21 +137,8 @@ void Renderer::mousePressed(GLFWwindow* window, int button, int action)
 			line->setShader(_shader);
 			line->init();
 			_meshes.push_back(line);
-			
-			float tmin = FLT_MAX;
-			Mesh* shape = nullptr;
-			for (auto& mesh : _meshes)
-			{
-				if (mesh->intersect(raycast))
-				{
-					if (tmin > raycast.t())
-					{
-						tmin = raycast.t();
-						shape = raycast.shape();
-					}
-				}
-			}
-			shape->setInColision(!shape->inColision());
+			if(_octree->intersect(raycast))
+				raycast.shape()->setInColision(!raycast.shape()->inColision());
 		}
 		break;
 		case GLFW_MOUSE_BUTTON_MIDDLE:

@@ -10,7 +10,9 @@ class Ray
 public:
 	Ray(glm::vec3 pos = glm::vec3(0.f), glm::vec3 dir = glm::vec3(0.f, 0.f, 1.f)) :
 		_origin(pos),
-		_direction(dir)
+		_direction(dir),
+		_t(std::numeric_limits<float>::max()),
+		_shape(nullptr)
 	{};
 	~Ray() {};
 

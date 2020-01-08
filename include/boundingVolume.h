@@ -15,6 +15,7 @@ public:
 	virtual void init() = 0;
 	virtual void update(const glm::mat4& mat) = 0;
 	virtual void render(const glm::mat4& mvp) = 0;
+	virtual bool contain(BoundingVolume& bv) = 0;
 	virtual bool intersect(BoundingVolume& bv) = 0;
 	virtual bool intersect(Ray& ray) = 0;
 
@@ -58,6 +59,7 @@ public:
 	void init();
 	void update(const glm::mat4& mat);
 	void render(const glm::mat4& mvp);
+	bool contain(BoundingVolume& bv);
 	bool intersect(BoundingVolume& bv);
 	bool intersect(Ray& ray);
 

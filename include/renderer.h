@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "mesh.h"
 #include "ray.h"
+#include "octree.h"
 
 class Renderer
 {
@@ -45,6 +46,7 @@ private:
 
 	Camera* _cam;
 
+	Octree* _octree;
 	std::vector<Mesh*> _meshes;
 
 	glm::vec2 _lastMouse;

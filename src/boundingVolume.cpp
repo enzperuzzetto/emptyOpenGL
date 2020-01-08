@@ -41,6 +41,25 @@ void AABB::render(const glm::mat4& vp)
 	box_render.render(vp, inColision);
 }
 
+bool AABB::contain(BoundingVolume& bv)
+{
+	AABB* box = dynamic_cast<AABB*>(&bv);
+	if (box != nullptr)
+	{
+		glm::vec3 min = center - radius;
+		glm::vec3 max = center + radius;
+		glm::vec3 boxMin = box->center - box->radius;
+		glm::vec3 boxMax = box->center + box->radius;
+
+		if (glm::all(glm::lessThanEqual(min, boxMin)) && glm::all(glm::greaterThanEqual(max, boxMax)))
+			return true;
+		else
+			return false;
+	}
+	else
+		return false;
+}
+
 bool AABB::intersect(BoundingVolume& bv)
 {
 	AABB* box = dynamic_cast<AABB*>(&bv);

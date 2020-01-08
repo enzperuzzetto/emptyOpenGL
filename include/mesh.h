@@ -21,7 +21,7 @@ public:
 	virtual ~Mesh();
 
 	void setShader(Shader& shader) { _shader = &shader; }
-	bool inColision() { return _bv->inColision; }
+	bool inColision() { if (_bv != nullptr) return _bv->inColision; return false; }
 	void setInColision(bool value) { _bv->inColision = value; }
 	BoundingVolume* getBoundingVolume() { return _bv; }
 

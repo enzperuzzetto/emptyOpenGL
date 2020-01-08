@@ -45,6 +45,7 @@ set(SRC_FILES
 	include/line.h
 	include/boundingVolume.h
 	include/ray.h	
+	include/octree.h
 		
 	#src
 	src/main.cpp
@@ -56,7 +57,7 @@ set(SRC_FILES
 	src/cube.cpp
 	src/line.cpp
 	src/boundingVolume.cpp
-	
+	src/octree.cpp
 )
 
 add_definitions(-DGLEW_STATIC)
